@@ -6,7 +6,8 @@ resource "aws_instance" "react_ec2" {
   ami           = "ami-07eef52105e8a2059" 
   instance_type = "t2.micro"
   key_name      = "universal"
-  security_groups = [aws_security_group.react_sg.name]
+  
+  subnet_id = aws_subnet.react_subnet.id
 
   tags = {
     Name = "React-EC2"
