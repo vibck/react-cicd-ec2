@@ -1,0 +1,53 @@
+name: Deploy React App to AWS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Step 2: Configure AWS Credentials
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1  
+
+      # Step 3: Setup Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.11.1
+
+      # Step 4: Terraform init & apply
+      - name: Initialize Terraform
+        run: terraform init
+        working-directory: terraform  
+
+      - name: Apply Terraform
+        run: terraform apply -auto-approve
+        working-directory: terraform
+
+      # Step 5: Setup SSH key for Ansible
+      - name: Setup SSH Key for Ansible
+        run: |
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > aws-key  # Setze private SSH-Schlüssel
+          chmod 600 aws-key  # Setze Berechtigungen für den SSH-Schlüssel
+
+      # Step 6: Run Ansible Playbook
+      - name: Run Ansible Playbook
+        run: |
+          echo "[react-server]" > inventory
+          echo "$(terraform output public_ip) ansible_user=ubuntu ansible_private_key_file=universal" >> inventory
+          ansible-playbook -i inventory ansible/playbook.yml
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: "False"  
