@@ -23,8 +23,8 @@ resource "aws_instance" "react_ec2" {
   instance_type = "t2.micro"
   key_name      = "universal"
   
-  subnet_id     = aws_subnet.react_subnet.id  # Subnetz zuweisen
-  vpc_security_group_ids = [aws_security_group.react_sg.id]  # Sicherheitsgruppe zuweisen
+  subnet_id     = aws_subnet.react_subnet.id
+  vpc_security_group_ids = [aws_security_group.react_sg.id]  
 
   tags = {
     Name = "React-EC2"
@@ -35,6 +35,7 @@ resource "aws_instance" "react_ec2" {
 resource "aws_security_group" "react_sg" {
   name        = "react-security-group-new"
   description = "Erlaubt HTTP und SSH"
+  vpc_id      = aws_vpc.react_vpc.id
 
   ingress {
     from_port   = 22
