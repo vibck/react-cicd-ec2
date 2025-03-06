@@ -1,0 +1,44 @@
+- name: Set up Ubuntu Server
+  hosts: all
+  become: true
+  tasks:
+    - name: Update apt & install dependencies
+      apt:
+        update_cache: yes
+        name:
+          - nginx
+          - nodejs
+          - npm
+        state: present
+
+    - name: Copy build files to Ubuntu
+      copy:
+        src: ../my-app/build/
+        dest: /var/www/react-app/
+        owner: www-data
+        group: www-data
+        mode: 0755
+
+    - name: Configure Nginx for React App
+      template:
+        src: nginx.conf.j2
+        dest: /etc/nginx/sites-available/react-app
+      notify:
+        - Restart Nginx
+
+    - name: Enable Nginx site
+      file:
+        src: /etc/nginx/sites-available/react-app
+        dest: /etc/nginx/sites-enabled/react-app
+        state: link
+
+    - name: Remove default Nginx site
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+
+  handlers:
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted
