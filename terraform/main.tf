@@ -14,7 +14,7 @@ resource "aws_instance" "react_ec2" {
 }
 
 resource "aws_security_group" "react_sg" {
-  name        = "react-security-group"
+  name        = "react-security-group-new"
   description = "Erlaubt HTTP und SSH"
 
   ingress {

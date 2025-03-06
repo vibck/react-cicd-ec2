@@ -40,8 +40,8 @@ jobs:
       # Step 5: Setup SSH key for Ansible
       - name: Setup SSH Key for Ansible
         run: |
-          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > aws-key  # Setze private SSH-Schlüssel
-          chmod 600 aws-key  # Setze Berechtigungen für den SSH-Schlüssel
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > universal
+          chmod 600 universal
 
       # Step 6: Run Ansible Playbook
       - name: Run Ansible Playbook
